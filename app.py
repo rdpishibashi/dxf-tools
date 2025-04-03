@@ -28,22 +28,22 @@ def create_download_link(data, filename, text="Download file"):
 
 def main():
     st.set_page_config(
-        page_title="DXF分析ツール",
+        page_title="DXF file Anlysis Tools",
         page_icon="📊",
         layout="wide",
     )
     
-    st.title('DXF分析ツール')
-    st.write('CADで使用されるDXFファイルを分析・比較するツールです')
+    st.title('DXF file Analysis Tools')
+    st.write('CADで出力されたDXFファイルを分析・比較するツールです')
     
     tool_selection = st.sidebar.radio(
         'ツールを選択',
         [
             'ラベル抽出', 
-            'DXF構造分析', 
-            'DXF階層抽出', 
-            'DXF差分比較(図形)', 
-            'DXF差分比較(ラベル)'
+            '構造分析＆Excel出力', 
+            '構造分析＆テキスト出力', 
+            '図形差分抽出＆DXF出力', 
+            'ラベル差分抽出'
         ]
     )
 
@@ -85,8 +85,8 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'DXF構造分析':
-        st.header('DXF構造を分析してExcelファイルに出力')
+    elif tool_selection == '構造分析＆Excel出力':
+        st.header('DXFデータ構造を分析してExcelファイルに出力')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="structure_analyzer")
         
         output_filename = st.text_input("出力ファイル名", "structure.xlsx")
@@ -127,8 +127,8 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'DXF階層抽出':
-        st.header('DXF階層構造をMarkdownで出力')
+    elif tool_selection == '構造分析＆テキスト出力':
+        st.header('DXFデータ構造を分析してMarkdown形式で出力')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="hierarchy_extractor")
         
         output_filename = st.text_input("出力ファイル名", "hierarchy.md")
@@ -140,12 +140,12 @@ def main():
                 # ファイルを一時ディレクトリに保存
                 temp_file = save_uploadedfile(uploaded_file)
                 
-                if st.button("階層構造を抽出"):
-                    with st.spinner('DXF階層構造を抽出中...'):
+                if st.button("構造を分析"):
+                    with st.spinner('DXF構造を分析中...'):
                         hierarchy_lines = extract_hierarchy(temp_file)
                         
                         # 結果を表示
-                        st.subheader("階層構造")
+                        st.subheader("構造分析結果")
                         st.text_area("Markdown形式", "\n".join(hierarchy_lines), height=300)
                         
                         # ダウンロードボタンを作成
@@ -164,8 +164,8 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'DXF差分比較(図形)':
-        st.header('2つのDXFファイルの図形差分を比較')
+    elif tool_selection == '図形差分抽出＆DXF出力':
+        st.header('2つのDXFファイルの図形を比較し差分を抽出')
         col1, col2 = st.columns(2)
         
         with col1:
@@ -178,7 +178,7 @@ def main():
         if not output_filename.endswith('.dxf'):
             output_filename += '.dxf'
         
-        tolerance = st.slider("許容誤差", min_value=1e-8, max_value=1e-4, value=1e-6, format="%.8f")
+        tolerance = st.slider("許容誤差", min_value=1e-8, max_value=1e-1, value=1e-6, format="%.8f")
         
         if uploaded_file_a is not None and uploaded_file_b is not None:
             try:
@@ -216,8 +216,8 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'DXF差分比較(ラベル)':
-        st.header('2つのDXFファイルのラベル差分を比較')
+    elif tool_selection == 'ラベル差分抽出':
+        st.header('2つのDXFファイルのラベルを比較し差分を抽出')
         col1, col2 = st.columns(2)
         
         with col1:
@@ -241,7 +241,7 @@ def main():
                         comparison_result = compare_labels(temp_file_a, temp_file_b)
                         
                         # 結果を表示
-                        st.subheader("ラベル差分比較結果")
+                        st.subheader("ラベル差分抽出結果")
                         st.markdown(comparison_result)
                         
                         # ダウンロードボタンを作成
