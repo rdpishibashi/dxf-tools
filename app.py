@@ -39,15 +39,15 @@ def main():
     tool_selection = st.sidebar.radio(
         'ツールを選択',
         [
-            'ラベル抽出', 
-            '構造分析＆Excel出力', 
-            '構造分析＆テキスト出力', 
-            '図形差分抽出＆DXF出力', 
-            'ラベル差分抽出'
+            'ラベル抽出（テキスト出力）', 
+            '構造分析（Excel出力）', 
+            '構造分析（テキスト出力）', 
+            '図形差分抽出（DXF出力）', 
+            'ラベル差分抽出（テキスト出力）'
         ]
     )
 
-    if tool_selection == 'ラベル抽出':
+    if tool_selection == 'ラベル抽出（テキスト出力）':
         st.header('DXFファイルからラベルを抽出')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="label_extractor")
         
@@ -85,7 +85,7 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == '構造分析＆Excel出力':
+    elif tool_selection == '構造分析（Excel出力）':
         st.header('DXFデータ構造を分析してExcelファイルに出力')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="structure_analyzer")
         
@@ -127,7 +127,7 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == '構造分析＆テキスト出力':
+    elif tool_selection == '構造分析（テキスト出力）':
         st.header('DXFデータ構造を分析してMarkdown形式で出力')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="hierarchy_extractor")
         
@@ -164,7 +164,7 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == '図形差分抽出＆DXF出力':
+    elif tool_selection == '図形差分抽出（DXF出力）':
         st.header('2つのDXFファイルの図形を比較し差分を抽出')
         col1, col2 = st.columns(2)
         
@@ -216,7 +216,7 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'ラベル差分抽出':
+    elif tool_selection == 'ラベル差分抽出（テキスト出力）':
         st.header('2つのDXFファイルのラベルを比較し差分を抽出')
         col1, col2 = st.columns(2)
         
