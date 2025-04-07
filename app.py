@@ -54,6 +54,38 @@ def main():
         output_filename = st.text_input("出力ファイル名", "labels.txt")
         if not output_filename.endswith('.txt'):
             output_filename += '.txt'
+        
+        # 新しいオプション
+        col1, col2 = st.columns(2)
+        with col1:
+            filter_option = st.checkbox(
+                "部品番号フィルター", 
+                value=False, 
+                help="以下の条件に合致するラベルは部品番号でないと判断して除外します："
+                     "\n- 最初の文字が「(」のラベル"
+                     "\n- 最初の文字が数字のラベル"
+                     "\n- 最初の文字が英小文字のラベル"
+                     "\n- 「GND」を含むラベル"
+                     "\n- 英字１文字のみのラベル（例：R, C）"
+                     "\n- 英字１文字に続いて数字（例：R1, C2, L3）"
+                     "\n- 英字１文字に続いて数字と「.」からなる文字列の組み合わせ（例：C1.1, R5.2, L1.1, N1.3）"
+                     "\n- 英字と「+」もしくは「-」の組み合わせ（例：A+, VCC-）"
+            )
+        
+        with col2:
+            sort_option = st.selectbox(
+                "ソート順", 
+                options=[
+                    ("ソートなし", "none"), 
+                    ("昇順", "asc"), 
+                    ("降順", "desc")
+                ],
+                format_func=lambda x: x[0],
+                help="ラベルのソート順を指定します"
+            )
+            sort_value = sort_option[1]  # タプルの2番目の要素（実際の値）を取得
+            
+        debug_option = st.checkbox("デバッグ情報を表示", value=False, help="フィルタリングの詳細情報を表示します")
             
         if uploaded_file is not None:
             try:
@@ -62,10 +94,29 @@ def main():
                 
                 if st.button("ラベルを抽出"):
                     with st.spinner('ラベルを抽出中...'):
-                        labels = extract_labels(temp_file)
+                        labels, info = extract_labels(
+                            temp_file, 
+                            filter_non_parts=filter_option, 
+                            sort_order=sort_value, 
+                            debug=debug_option
+                        )
                         
                         # 結果を表示
                         st.subheader("抽出されたラベル")
+                        
+                        # 処理情報の表示
+                        st.info(f"元の抽出ラベル総数: {info['total_extracted']}")
+                        
+                        if filter_option:
+                            st.info(f"フィルタリングで除外したラベル数: {info['filtered_count']}")
+                        
+                        st.info(f"最終的なラベル数: {info['final_count']}")
+                        
+                        if sort_value != "none":
+                            sort_text = "昇順" if sort_value == "asc" else "降順"
+                            st.info(f"ラベルを{sort_text}でソートしました")
+                        
+                        # ラベル一覧
                         st.text_area("ラベル一覧", "\n".join(labels), height=300)
                         
                         # ダウンロードボタンを作成
