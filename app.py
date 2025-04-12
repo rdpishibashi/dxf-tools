@@ -45,8 +45,8 @@ def main():
             '構造分析（テキスト出力）', 
             '図形差分抽出（DXF出力）', 
             'ラベル差分抽出（テキスト出力）',
-            'パーツリスト差分抽出（テキスト出力）',
-            '回路記号抽出（テキスト出力）'
+            '回路記号抽出（テキスト出力）',
+            'パーツリスト差分抽出（テキスト出力）'
         ]
     )
 
@@ -81,14 +81,15 @@ def main():
         
         with col2:
             sort_option = st.selectbox(
-                "ソート順", 
+                "並び替え", 
                 options=[
-                    ("ソートなし", "none"), 
                     ("昇順", "asc"), 
-                    ("降順", "desc")
+                    ("逆順", "desc"),
+                    ("並び替えなし", "none")
                 ],
                 format_func=lambda x: x[0],
-                help="ラベルのソート順を指定します"
+                help="ラベルの並び替え順を指定します",
+                index=0  # デフォルトで昇順を選択
             )
             sort_value = sort_option[1]  # タプルの2番目の要素（実際の値）を取得
             
@@ -317,51 +318,7 @@ def main():
             except Exception as e:
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
-    
-    elif tool_selection == 'パーツリスト差分抽出（テキスト出力）':
-        st.header('2つのDXFファイルのパーツリストを比較し差分を抽出')
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            uploaded_file_a = st.file_uploader("基準DXFファイル (A)", type="dxf", key="partslist_a")
-        
-        with col2:
-            uploaded_file_b = st.file_uploader("比較対象DXFファイル (B)", type="dxf", key="partslist_b")
-        
-        output_filename = st.text_input("出力ファイル名", "partslist_diff.md")
-        if not output_filename.endswith('.md'):
-            output_filename += '.md'
-        
-        if uploaded_file_a is not None and uploaded_file_b is not None:
-            try:
-                # ファイルを一時ディレクトリに保存
-                temp_file_a = save_uploadedfile(uploaded_file_a)
-                temp_file_b = save_uploadedfile(uploaded_file_b)
-                
-                if st.button("パーツリスト差分を比較"):
-                    with st.spinner('パーツリストを比較中...'):
-                        comparison_result = compare_parts_list(temp_file_a, temp_file_b)
-                        
-                        # 結果を表示
-                        st.subheader("パーツリスト差分抽出結果")
-                        st.markdown(comparison_result)
-                        
-                        # ダウンロードボタンを作成
-                        st.download_button(
-                            label="Markdownファイルをダウンロード",
-                            data=comparison_result.encode('utf-8'),
-                            file_name=output_filename,
-                            mime="text/markdown",
-                        )
-                    
-                    # 一時ファイルの削除
-                    os.unlink(temp_file_a)
-                    os.unlink(temp_file_b)
-            
-            except Exception as e:
-                st.error(f"エラーが発生しました: {str(e)}")
-                st.error(traceback.format_exc())
-                
+   
     elif tool_selection == '回路記号抽出（テキスト出力）':
         st.header('ULKES Excelファイルから回路記号を抽出')
         
@@ -418,6 +375,50 @@ def main():
                     
                     # 一時ファイルの削除
                     os.unlink(temp_file)
+            
+            except Exception as e:
+                st.error(f"エラーが発生しました: {str(e)}")
+                st.error(traceback.format_exc())
+
+    elif tool_selection == 'パーツリスト差分抽出（テキスト出力）':
+        st.header('2つのDXFファイルのパーツリストを比較し差分を抽出')
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            uploaded_file_a = st.file_uploader("基準DXFファイル (A)", type="dxf", key="partslist_a")
+        
+        with col2:
+            uploaded_file_b = st.file_uploader("比較対象DXFファイル (B)", type="dxf", key="partslist_b")
+        
+        output_filename = st.text_input("出力ファイル名", "partslist_diff.md")
+        if not output_filename.endswith('.md'):
+            output_filename += '.md'
+        
+        if uploaded_file_a is not None and uploaded_file_b is not None:
+            try:
+                # ファイルを一時ディレクトリに保存
+                temp_file_a = save_uploadedfile(uploaded_file_a)
+                temp_file_b = save_uploadedfile(uploaded_file_b)
+                
+                if st.button("パーツリスト差分を比較"):
+                    with st.spinner('パーツリストを比較中...'):
+                        comparison_result = compare_parts_list(temp_file_a, temp_file_b)
+                        
+                        # 結果を表示
+                        st.subheader("パーツリスト差分抽出結果")
+                        st.markdown(comparison_result)
+                        
+                        # ダウンロードボタンを作成
+                        st.download_button(
+                            label="Markdownファイルをダウンロード",
+                            data=comparison_result.encode('utf-8'),
+                            file_name=output_filename,
+                            mime="text/markdown",
+                        )
+                    
+                    # 一時ファイルの削除
+                    os.unlink(temp_file_a)
+                    os.unlink(temp_file_b)
             
             except Exception as e:
                 st.error(f"エラーが発生しました: {str(e)}")
