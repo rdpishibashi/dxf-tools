@@ -12,10 +12,11 @@ from utils.structure_record import analyze_dxf_structure
 from utils.hierarchy import extract_hierarchy
 from utils.compare_dxf import compare_dxf_files_and_generate_dxf
 from utils.compare_text import compare_labels
+from utils.circuit_symbol_extractor import extract_circuit_symbols
 
 def save_uploadedfile(uploadedfile):
     """アップロードされたファイルを一時ディレクトリに保存する"""
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".dxf") as f:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploadedfile.name)[1]) as f:
         f.write(uploadedfile.getbuffer())
         return f.name
 
@@ -43,7 +44,8 @@ def main():
             '構造分析（Excel出力）', 
             '構造分析（テキスト出力）', 
             '図形差分抽出（DXF出力）', 
-            'ラベル差分抽出（テキスト出力）'
+            'ラベル差分抽出（テキスト出力）',
+            '回路記号抽出（テキスト出力）'
         ]
     )
 
@@ -216,7 +218,7 @@ def main():
                 st.error(traceback.format_exc())
 
     elif tool_selection == '図形差分抽出（DXF出力）':
-        st.header('2つのDXFファイルを比較し差分を抽出')
+        st.header('2つのDXFファイルの図形を比較し差分を抽出')
         col1, col2 = st.columns(2)
         
         with col1:
@@ -306,6 +308,67 @@ def main():
                     # 一時ファイルの削除
                     os.unlink(temp_file_a)
                     os.unlink(temp_file_b)
+            
+            except Exception as e:
+                st.error(f"エラーが発生しました: {str(e)}")
+                st.error(traceback.format_exc())
+                
+    elif tool_selection == '回路記号抽出（テキスト出力）':
+        st.header('ULKES Excelファイルから回路記号を抽出')
+        
+        uploaded_file = st.file_uploader("Excelファイルをアップロード", type=["xlsx"], key="circuit_extractor")
+        
+        # アセンブリ番号入力
+        col1, col2 = st.columns(2)
+        with col1:
+            output_filename = st.text_input("出力ファイル名", "circuit_symbols.txt")
+            if not output_filename.endswith('.txt'):
+                output_filename += '.txt'
+        
+        with col2:
+            use_filename = st.checkbox("ファイル名を図面番号号として使用", value=True)
+            assembly_number = None if use_filename else st.text_input("図面番号", "")
+            
+        if uploaded_file is not None:
+            try:
+                # ファイルを一時ディレクトリに保存
+                temp_file = save_uploadedfile(uploaded_file)
+                
+                if st.button("回路記号を抽出"):
+                    with st.spinner('回路記号を抽出中...'):
+                        # ファイル名からアセンブリ番号を取得
+                        if use_filename:
+                            filename = os.path.basename(uploaded_file.name)
+                            assembly_number = os.path.splitext(filename)[0]
+                        
+                        # 回路記号を抽出
+                        symbols, info = extract_circuit_symbols(temp_file, assembly_number)
+                        
+                        # 処理結果の表示
+                        st.subheader("抽出結果")
+                        
+                        if info["error"]:
+                            st.error(f"エラー: {info['error']}")
+                        else:
+                            st.info(f"図面番号: {info['assembly_number']}")
+                            st.info(f"対象データ行数: {info['processed_rows']} / {info['total_rows']}")
+                            st.info(f"抽出された回路記号数: {info['total_symbols']}")
+                            
+                            # 抽出された回路記号の表示
+                            st.text_area("回路記号リスト", "\n".join(symbols), height=300)
+                            
+                            # ダウンロードボタンを作成
+                            if symbols:
+                                txt_str = "\n".join(symbols)
+                                st.download_button(
+                                    label="テキストファイルをダウンロード",
+                                    data=txt_str.encode('utf-8'),
+                                    file_name=output_filename,
+                                    mime="text/plain",
+                                )
+                    
+                    # 一時ファイルの削除
+                    os.unlink(temp_file)
             
             except Exception as e:
                 st.error(f"エラーが発生しました: {str(e)}")
