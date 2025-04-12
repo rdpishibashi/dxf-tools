@@ -8,11 +8,12 @@ import traceback
 
 # モジュールのインポート
 from utils.extract_labels import extract_labels
-from utils.structure_record import analyze_dxf_structure 
-from utils.hierarchy import extract_hierarchy
+from utils.analyze_structure import analyze_dxf_structure 
+from utils.extract_hierarchy import extract_hierarchy
 from utils.compare_dxf import compare_dxf_files_and_generate_dxf
-from utils.compare_text import compare_labels
-from utils.circuit_symbol_extractor import extract_circuit_symbols
+from utils.compare_labels import compare_labels
+from utils.extract_symbols import extract_circuit_symbols
+from utils.compare_partslist import compare_parts_list, normalize_label
 
 def save_uploadedfile(uploadedfile):
     """アップロードされたファイルを一時ディレクトリに保存する"""
