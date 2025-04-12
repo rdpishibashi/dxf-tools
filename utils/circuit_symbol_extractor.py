@@ -24,28 +24,39 @@ def extract_circuit_symbols(input_excel, assembly_number=None):
     
     Args:
         input_excel (str): 入力Excelファイルのパス
-        assembly_number (str, optional): 図面番号。指定しない場合はファイル名から抽出
+        assembly_number (str, optional): 図面番号（指定しない場合はファイル名から抽出）
         
     Returns:
         tuple: (回路記号リスト, 処理情報)
     """
+    # 情報を格納する辞書を先に初期化
+    info = {
+        "assembly_number": assembly_number if assembly_number else os.path.splitext(os.path.basename(input_excel))[0],
+        "total_rows": 0,
+        "processed_rows": 0,
+        "total_symbols": 0,
+        "error": None
+    }
+    
     try:
         # アセンブリ番号がない場合は入力ファイル名から抽出
         if not assembly_number:
             filename = os.path.basename(input_excel)
             assembly_number = os.path.splitext(filename)[0]  # 拡張子を除いた部分
+            info["assembly_number"] = assembly_number
         
-        # Excelファイルを読み込む（1行目をヘッダーとして）
-        df = pd.read_excel(input_excel)
+        try:
+            # Excelファイルを読み込む（1行目をヘッダーとして）
+            df = pd.read_excel(input_excel, engine='openpyxl')
+        except ImportError:
+            # openpyxlがインストールされていない場合は代替エンジンを試す
+            try:
+                df = pd.read_excel(input_excel)
+            except Exception as e:
+                info["error"] = f"Excelファイルの読み込みに失敗しました: {str(e)}。依存関係 'openpyxl' をインストールしてください。"
+                return [], info
         
-        # 情報を格納する辞書
-        info = {
-            "assembly_number": assembly_number,
-            "total_rows": len(df),
-            "processed_rows": 0,
-            "total_symbols": 0,
-            "error": None
-        }
+        info["total_rows"] = len(df)
         
         # ファイルが存在し、必要な列があるか確認
         required_columns = ["符号", "構成コメント", "構成数", "図面番号"]
@@ -75,7 +86,7 @@ def extract_circuit_symbols(input_excel, assembly_number=None):
         info["processed_rows"] = len(processing_rows)
         
         if not processing_rows:
-            info["error"] = f"処理対象となる行が見つかりません。アセンブリ番号 '{assembly_number}' が図面番号列に存在するか確認してください。"
+            info["error"] = f"処理対象となる行が見つかりません。図面番号 '{assembly_number}' が図面番号列に存在するか確認してください。"
             return [], info
         
         # 回路記号リストを格納するリスト
