@@ -62,7 +62,7 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             filter_option = st.checkbox(
-                "回路記号フィルター", 
+                "回路記号（候補）のみ抽出", 
                 value=False, 
                 help="以下の条件に合致するラベルは回路記号でないと判断して除外します："
                      "\n- 最初の文字が「(」（例：(BK), (M5)）"
@@ -381,14 +381,14 @@ def main():
                 st.error(traceback.format_exc())
 
     elif tool_selection == 'パーツリスト差分抽出（テキスト出力）':
-        st.header('2つのDXFファイルのパーツリストを比較し差分を抽出')
+        st.header('2つのパーツリストを比較し差分を抽出')
         col1, col2 = st.columns(2)
         
         with col1:
-            uploaded_file_a = st.file_uploader("基準DXFファイル (A)", type="dxf", key="partslist_a")
+            uploaded_file_a = st.file_uploader("パーツリスト・ファイルA", type="txt", key="partslist_a")
         
         with col2:
-            uploaded_file_b = st.file_uploader("比較対象DXFファイル (B)", type="dxf", key="partslist_b")
+            uploaded_file_b = st.file_uploader("パーツリスト・ファイルB", type="txt", key="partslist_b")
         
         output_filename = st.text_input("出力ファイル名", "partslist_diff.md")
         if not output_filename.endswith('.md'):
