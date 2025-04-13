@@ -6,12 +6,13 @@ import os
 import sys
 import traceback
 
-# モジュールのインポート - 正しいモジュール名に修正
+# モジュールのインポート
 from utils.extract_labels import extract_labels
 from utils.analyze_structure import analyze_dxf_structure
 from utils.extract_hierachy import extract_hierachy
 from utils.compare_dxf import compare_dxf_files_and_generate_dxf
 from utils.compare_labels import compare_labels
+from utils.extract_symbols import extract_circuit_symbols
 from utils.compare_partslist import compare_parts_list, normalize_label
 
 def save_uploadedfile(uploadedfile):
