@@ -42,13 +42,13 @@ def compare_labels(dxf_file_a, dxf_file_b):
     
     # マークダウン形式の出力を生成
     output = []
-    output.append("# DXFラベル差分比較結果\n")
+    output.append("## DXFラベル差分比較結果\n")
     
-    output.append("## 追加されたラベル (added)")
+    output.append("### 追加されたラベル (added)")
     for label, count in (labels_b - labels_a).items():
         output.append(f"- {label} (+{count})")
     
-    output.append("\n## 削除されたラベル (deleted)")
+    output.append("\n### 削除されたラベル (deleted)")
     for label, count in (labels_a - labels_b).items():
         output.append(f"- {label} (-{count})")
     

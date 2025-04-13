@@ -36,7 +36,7 @@ def main():
     )
     
     st.title('DXF file Analysis Tools')
-    st.write('CADで出力されたDXFファイルを分析・比較するツールです')
+    st.write('CADのDXFファイルを分析・比較するツールです')
     
     # メニュー順序を元の順序に合わせる
     tool_selection = st.sidebar.radio(
@@ -48,7 +48,7 @@ def main():
             '図形差分抽出（DXF出力）', 
             'ラベル差分抽出（テキスト出力）',
             '回路記号抽出（テキスト出力）',
-            'パーツリスト差分抽出（テキスト出力）'
+            '回路記号リスト差分抽出（テキスト出力）'
         ]
     )
 
@@ -147,7 +147,7 @@ def main():
                 st.error(traceback.format_exc())
 
     elif tool_selection == '構造分析（Excel出力）':
-        st.header('DXFデータ構造を分析してExcelファイルに出力')
+        st.header('DXFデータ構造を分析しExcelファイルに出力')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="structure_analyzer")
         
         output_filename = st.text_input("出力ファイル名", "structure.xlsx")
@@ -160,7 +160,7 @@ def main():
                 temp_file = save_uploadedfile(uploaded_file)
                 
                 if st.button("構造を分析"):
-                    with st.spinner('DXF構造を分析中...'):
+                    with st.spinner('DXFデータ構造を分析中...'):
                         data = analyze_dxf_structure(temp_file)
                         df = pd.DataFrame(data, columns=['Section', 'Entity', 'GroupCode', 'GroupCode Definition', 'Value'])
                         
@@ -189,7 +189,7 @@ def main():
                 st.error(traceback.format_exc())
 
     elif tool_selection == '構造分析（テキスト出力）':
-        st.header('DXFデータ構造を分析してMarkdown形式で出力')
+        st.header('DXFデータ構造を分析しマークダウン形式のテキストファイルで出力')
         uploaded_file = st.file_uploader("DXFファイルをアップロード", type="dxf", key="hierarchy_extractor")
         
         output_filename = st.text_input("出力ファイル名", "hierarchy.md")
@@ -202,17 +202,17 @@ def main():
                 temp_file = save_uploadedfile(uploaded_file)
                 
                 if st.button("構造を分析"):
-                    with st.spinner('DXF構造を分析中...'):
+                    with st.spinner('DXFデータ構造を分析中...'):
                         hierachy_lines = extract_hierachy(temp_file)
                         
                         # 結果を表示
                         st.subheader("構造分析結果")
-                        st.text_area("Markdown形式", "\n".join(hierachy_lines), height=300)
+                        st.text_area("マークダウン形式テキスト", "\n".join(hierachy_lines), height=300)
                         
                         # ダウンロードボタンを作成
                         md_str = "\n".join(hierachy_lines)
                         st.download_button(
-                            label="Markdownファイルをダウンロード",
+                            label="マークダウン形式テキストファイルをダウンロード",
                             data=md_str.encode('utf-8'),
                             file_name=output_filename,
                             mime="text/markdown",
@@ -226,7 +226,7 @@ def main():
                 st.error(traceback.format_exc())
 
     elif tool_selection == '図形差分抽出（DXF出力）':
-        st.header('2つのDXFファイルの図形を比較し差分を抽出')
+        st.header('2つのDXFファイルを比較し差分を抽出しDXFフォーマットで出力')
         col1, col2 = st.columns(2)
         
         with col1:
@@ -278,7 +278,7 @@ def main():
                 st.error(traceback.format_exc())
 
     elif tool_selection == 'ラベル差分抽出（テキスト出力）':
-        st.header('2つのDXFファイルのラベルを比較し差分を抽出')
+        st.header('2つのDXFファイルのラベルを比較し、差分をマークダウン形式テキストファイルで出力')
         col1, col2 = st.columns(2)
         
         with col1:
@@ -307,7 +307,7 @@ def main():
                         
                         # ダウンロードボタンを作成
                         st.download_button(
-                            label="Markdownファイルをダウンロード",
+                            label="差分テキストファイルをダウンロード",
                             data=comparison_result.encode('utf-8'),
                             file_name=output_filename,
                             mime="text/markdown",
@@ -334,7 +334,7 @@ def main():
                 output_filename += '.txt'
         
         with col2:
-            use_filename = st.checkbox("ファイル名を図面番号号として使用", value=True)
+            use_filename = st.checkbox("ファイル名を図面番号として使用", value=True)
             assembly_number = None if use_filename else st.text_input("図面番号", "")
             
         if uploaded_file is not None:
@@ -382,15 +382,15 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'パーツリスト差分抽出（テキスト出力）':
-        st.header('2つのパーツリストを比較し差分を抽出')
+    elif tool_selection == '回路記号リスト差分抽出（テキスト出力）':
+        st.header('2つの回路記号リストを比較し差分を抽出し、マークダウン形式テキストファイルで出力')
         col1, col2 = st.columns(2)
         
         with col1:
-            uploaded_file_a = st.file_uploader("パーツリスト・ファイルA", type=["txt"], key="partslist_a")
+            uploaded_file_a = st.file_uploader("回路記号リスト・ファイルA", type=["txt"], key="partslist_a")
         
         with col2:
-            uploaded_file_b = st.file_uploader("パーツリスト・ファイルB", type=["txt"], key="partslist_b")
+            uploaded_file_b = st.file_uploader("回路記号リスト・ファイルB", type=["txt"], key="partslist_b")
         
         output_filename = st.text_input("出力ファイル名", "partslist_diff.md")
         if not output_filename.endswith('.md'):
@@ -402,19 +402,19 @@ def main():
                 temp_file_a = save_uploadedfile(uploaded_file_a)
                 temp_file_b = save_uploadedfile(uploaded_file_b)
                 
-                if st.button("パーツリスト差分を比較"):
-                    with st.spinner('パーツリストを比較中...'):
+                if st.button("回路記号リストを比較"):
+                    with st.spinner('回路記号リストを比較中...'):
                         try:
                             # パーツリストの比較
                             comparison_result = compare_parts_list(temp_file_a, temp_file_b)
                             
                             # 結果を表示
-                            st.subheader("パーツリスト差分抽出結果")
+                            st.subheader("回路記号リスト差分抽出結果")
                             st.markdown(comparison_result)
                             
                             # ダウンロードボタンを作成
                             st.download_button(
-                                label="Markdownファイルをダウンロード",
+                                label="テキストファイルをダウンロード",
                                 data=comparison_result.encode('utf-8'),
                                 file_name=output_filename,
                                 mime="text/markdown",
