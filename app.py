@@ -380,45 +380,50 @@ def main():
                 st.error(f"エラーが発生しました: {str(e)}")
                 st.error(traceback.format_exc())
 
-    elif tool_selection == 'パーツリスト差分抽出（テキスト出力）':
-        st.header('2つのパーツリストを比較し差分を抽出')
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            uploaded_file_a = st.file_uploader("パーツリスト・ファイルA", type="txt", key="partslist_a")
-        
-        with col2:
-            uploaded_file_b = st.file_uploader("パーツリスト・ファイルB", type="txt", key="partslist_b")
-        
+    elif tool_selection == "パーツリスト比較":
+        st.header("パーツリスト比較")
+        st.write("テキスト形式の図面ラベルリストと回路記号リストを比較し、差分を抽出します。")
+
+        uploaded_file_a = st.file_uploader("図面ラベルリストファイル (テキスト形式)", type=['txt'], key="partslist_a")
+        uploaded_file_b = st.file_uploader("回路記号リストファイル (テキスト形式)", type=['txt'], key="partslist_b")
+
         output_filename = st.text_input("出力ファイル名", "partslist_diff.md")
         if not output_filename.endswith('.md'):
             output_filename += '.md'
-        
+
         if uploaded_file_a is not None and uploaded_file_b is not None:
             try:
-                # ファイルを一時ディレクトリに保存
-                temp_file_a = save_uploadedfile(uploaded_file_a)
-                temp_file_b = save_uploadedfile(uploaded_file_b)
-                
+                # ★★★ 修正箇所 ★★★
+                # 一時ファイルに保存するのではなく、ファイルの内容を読み込む
+                # compare_parts_list はファイルの内容を期待するため
+                content_a = uploaded_file_a.getvalue().decode('utf-8') # または適切なエンコーディング
+                content_b = uploaded_file_b.getvalue().decode('utf-8') # または適切なエンコーディング
+
                 if st.button("パーツリスト差分を比較"):
                     with st.spinner('パーツリストを比較中...'):
-                        comparison_result = compare_parts_list(temp_file_a, temp_file_b)
-                        
+                        # ★★★ 修正箇所 ★★★
+                        # compare_parts_listの戻り値をアンパックして受け取る
+                        markdown_output, process_info = compare_parts_list(content_a, content_b)
+
                         # 結果を表示
                         st.subheader("パーツリスト差分抽出結果")
-                        st.markdown(comparison_result)
-                        
+                        # ★★★ 修正箇所 ★★★
+                        # markdown_output (文字列) を渡す
+                        st.markdown(markdown_output)
+
                         # ダウンロードボタンを作成
                         st.download_button(
                             label="Markdownファイルをダウンロード",
-                            data=comparison_result.encode('utf-8'),
+                            # ★★★ 修正箇所 ★★★
+                            # markdown_output (文字列) をエンコードして渡す
+                            data=markdown_output.encode('utf-8'),
                             file_name=output_filename,
                             mime="text/markdown",
                         )
                     
                     # 一時ファイルの削除
-                    os.unlink(temp_file_a)
-                    os.unlink(temp_file_b)
+                    # os.unlink(temp_file_a)
+                    # os.unlink(temp_file_b)
             
             except Exception as e:
                 st.error(f"エラーが発生しました: {str(e)}")
