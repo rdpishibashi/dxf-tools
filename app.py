@@ -297,7 +297,7 @@ def main():
                 
                 if st.button("ラベル差分を比較"):
                     with st.spinner('DXFラベルを比較中...'):
-                        comparison_result = compare_labels(temp_file_a, temp_file_b)
+                        comparison_result, info = compare_parts_list(temp_file_a, temp_file_b)
                         
                         # 結果を表示
                         st.subheader("ラベル差分抽出結果")
