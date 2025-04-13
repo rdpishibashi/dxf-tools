@@ -52,9 +52,9 @@ def compare_parts_list(dxf_labels_file, circuit_symbols_file):
 
         # マークダウン形式で出力を生成
         output = []
-        output.append("# 図面ラベルと回路記号の差分比較結果\n")
+        output.append("## 図面ラベルと回路記号の差分比較結果\n")
 
-        output.append("## 処理概要")
+        output.append("### 処理概要")
         output.append(f"- 図面ラベル数: {len(dxf_labels)} (ユニーク: {len(dxf_counter)})")
         output.append(f"- 回路記号数: {len(circuit_symbols)} (ユニーク: {len(circuit_counter)})")
         output.append(f"- 共通ユニークラベル数: {common_unique_labels_count}")
@@ -62,7 +62,7 @@ def compare_parts_list(dxf_labels_file, circuit_symbols_file):
         output.append(f"- 回路記号に不足しているラベル総数: {missing_in_circuit_total_count}")
         output.append("")
 
-        output.append("## 図面に不足しているラベル（回路記号リストには存在する）")
+        output.append("### 図面に不足しているラベル（回路記号リストには存在する）")
         if missing_in_dxf_expanded:
             for symbol in missing_in_dxf_expanded:
                 output.append(f"- {symbol}")
@@ -70,7 +70,7 @@ def compare_parts_list(dxf_labels_file, circuit_symbols_file):
             output.append("- なし")
         output.append("")
 
-        output.append("## 回路記号リストに不足しているラベル（図面には存在する）")
+        output.append("### 回路記号リストに不足しているラベル（図面には存在する）")
         if missing_in_circuit_expanded:
             for label in missing_in_circuit_expanded:
                 output.append(f"- {label}")
@@ -83,6 +83,6 @@ def compare_parts_list(dxf_labels_file, circuit_symbols_file):
     except Exception as e:
         # エラーメッセージをマークダウン形式で返す
         error_output = []
-        error_output.append("# エラーが発生しました\n")
+        error_output.append("## エラーが発生しました\n")
         error_output.append(f"エラー内容: {str(e)}")
         return "\n".join(error_output)

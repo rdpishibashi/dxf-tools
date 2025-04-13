@@ -69,10 +69,10 @@ def extract_hierachy(dxf_file):
     hierarchy = []
 
     # HEADER
-    hierarchy.append("# SECTION: HEADER")
+    hierarchy.append("## SECTION: HEADER")
 
     # TABLES
-    hierarchy.append("# SECTION: TABLES")
+    hierarchy.append("## SECTION: TABLES")
     for table_name, table in {
         'LAYERS': doc.layers,
         'LTYPE': doc.linetypes,
@@ -80,34 +80,34 @@ def extract_hierachy(dxf_file):
         'DIMSTYLES': doc.dimstyles,
         'UCS': doc.ucs
     }.items():
-        hierarchy.append(f"## TABLE: {table_name}")
+        hierarchy.append(f"### TABLE: {table_name}")
         for entry in table:
-            hierarchy.append(f"### ENTRY: {entry.dxf.name}")
+            hierarchy.append(f"#### ENTRY: {entry.dxf.name}")
             for key, value in entry.dxf.all_existing_dxf_attribs().items():
                 hierarchy.append(f"- {key}: {value}")
 
     # BLOCKS
-    hierarchy.append("# SECTION: BLOCKS")
+    hierarchy.append("## SECTION: BLOCKS")
     for block in doc.blocks:
-        hierarchy.append(f"## BLOCK: {block.name}")
+        hierarchy.append(f"### BLOCK: {block.name}")
         for entity in block:
-            hierarchy.append(f"### ENTITY: {entity.dxftype()}")
+            hierarchy.append(f"#### ENTITY: {entity.dxftype()}")
             hierarchy.extend(get_sorted_entity_tags(entity))
 
     # ENTITIES
-    hierarchy.append("# SECTION: ENTITIES")
+    hierarchy.append("## SECTION: ENTITIES")
     msp = doc.modelspace()
     for entity in msp:
-        hierarchy.append(f"## ENTITY: {entity.dxftype()}")
+        hierarchy.append(f"### ENTITY: {entity.dxftype()}")
         hierarchy.extend(get_sorted_entity_tags(entity))
 
     # OBJECTS
-    hierarchy.append("# SECTION: OBJECTS")
+    hierarchy.append("## SECTION: OBJECTS")
     for obj in doc.objects:
-        hierarchy.append(f"## OBJECT: {obj.dxftype()}")
+        hierarchy.append(f"### OBJECT: {obj.dxftype()}")
         hierarchy.extend(get_sorted_entity_tags(obj))
 
     # CLASSES
-    hierarchy.append("# SECTION: CLASSES (if present)")
+    hierarchy.append("## SECTION: CLASSES (if present)")
 
     return hierarchy

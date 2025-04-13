@@ -203,14 +203,14 @@ def main():
                 
                 if st.button("構造を分析"):
                     with st.spinner('DXF構造を分析中...'):
-                        hierarchy_lines = extract_hierarchy(temp_file)
+                        hierachy_lines = extract_hierachy(temp_file)
                         
                         # 結果を表示
                         st.subheader("構造分析結果")
-                        st.text_area("Markdown形式", "\n".join(hierarchy_lines), height=300)
+                        st.text_area("Markdown形式", "\n".join(hierachy_lines), height=300)
                         
                         # ダウンロードボタンを作成
-                        md_str = "\n".join(hierarchy_lines)
+                        md_str = "\n".join(hierachy_lines)
                         st.download_button(
                             label="Markdownファイルをダウンロード",
                             data=md_str.encode('utf-8'),
